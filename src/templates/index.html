@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>彩票号码筛选系统</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
+        .container { max-width: 900px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1, h2 { color: #0056b3; }
+        .section { margin-bottom: 30px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="number"], input[type="text"] { width: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #0056b3; }
+        .results, .history-results { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+        .results div, .history-results div { margin-bottom: 10px; padding: 10px; background-color: #e9ecef; border-radius: 4px; }
+        .ball-red { color: red; font-weight: bold; }
+        .ball-blue { color: blue; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>彩票号码筛选系统</h1>
+
+        <div class="section">
+            <h2>生成大乐透号码</h2>
+            <div class="form-group">
+                <label for="dlt_num_sets">生成数量:</label>
+                <input type="number" id="dlt_num_sets" value="1" min="1">
+                <button onclick="generateDltNumbers()">生成</button>
+            </div>
+            <div id="dlt_suggestions" class="results"></div>
+        </div>
+
+        <div class="section">
+            <h2>生成双色球号码</h2>
+            <div class="form-group">
+                <label for="ssq_num_sets">生成数量:</label>
+                <input type="number" id="ssq_num_sets" value="1" min="1">
+                <button onclick="generateSsqNumbers()">生成</button>
+            </div>
+            <div id="ssq_suggestions" class="results"></div>
+        </div>
+
+        <div class="section">
+            <h2>查询大乐透历史开奖</h2>
+            <div class="form-group">
+                <label for="dlt_issue_number">期号:</label>
+                <input type="text" id="dlt_issue_number" placeholder="例如: 24108">
+                <button onclick="queryDltHistory()">查询</button>
+            </div>
+            <div id="dlt_history_results" class="history-results"></div>
+        </div>
+
+        <div class="section">
+            <h2>查询双色球历史开奖</h2>
+            <div class="form-group">
+                <label for="ssq_issue_number">期号:</label>
+                <input type="text" id="ssq_issue_number" placeholder="例如: 24108">
+                <button onclick="querySsqHistory()">查询</button>
+            </div>
+            <div id="ssq_history_results" class="history-results"></div>
+        </div>
+
+        <div class="section">
+            <h2>最新10期大乐透开奖</h2>
+            <div id="latest_dlt_draws"></div>
+        </div>
+
+        <div class="section">
+            <h2>最新10期双色球开奖</h2>
+            <div id="latest_ssq_draws"></div>
+        </div>
+
+    </div>
+
+    <script>
+        async function generateDltNumbers() {
+            const numSets = document.getElementById("dlt_num_sets").value;
+            const response = await fetch(`/generate_dlt?num_sets=${numSets}`);
+            const data = await response.json();
+            const resultsDiv = document.getElementById("dlt_suggestions");
+            resultsDiv.innerHTML = "";
+            if (data.error) {
+                resultsDiv.innerHTML = `<div class="error">${data.error}</div>`;
+            } else {
+                data.forEach((set, index) => {
+                    resultsDiv.innerHTML += `<div>方案 ${index + 1}: 红球 <span class="ball-red">${set.red_balls.join(", ")}</span>, 蓝球 <span class="ball-blue">${set.blue_balls.join(", ")}</span></div>`;
+                });
+            }
+        }
+
+        async function generateSsqNumbers() {
+            const numSets = document.getElementById("ssq_num_sets").value;
+            const response = await fetch(`/generate_ssq?num_sets=${numSets}`);
+            const data = await response.json();
+            const resultsDiv = document.getElementById("ssq_suggestions");
+            resultsDiv.innerHTML = "";
+            if (data.error) {
+                resultsDiv.innerHTML = `<div class="error">${data.error}</div>`;
+            } else {
+                data.forEach((set, index) => {
+                    resultsDiv.innerHTML += `<div>方案 ${index + 1}: 红球 <span class="ball-red">${set.red_balls.join(", ")}</span>, 蓝球 <span class="ball-blue">${set.blue_balls.join(", ")}</span></div>`;
+                });
+            }
+        }
+
+        async function queryDltHistory() {
+            const issueNumber = document.getElementById("dlt_issue_number").value;
+            const response = await fetch(`/query_dlt?issue_number=${issueNumber}`);
+            const data = await response.json();
+            const resultsDiv = document.getElementById("dlt_history_results");
+            resultsDiv.innerHTML = "";
+            if (data.error) {
+                resultsDiv.innerHTML = `<div class="error">${data.error}</div>`;
+            } else {
+                resultsDiv.innerHTML = `
+                    <div>
+                        <strong>期号:</strong> ${data.issue_number}<br>
+                        <strong>开奖日期:</strong> ${data.draw_date}<br>
+                        <strong>红球:</strong> <span class="ball-red">${data.red_balls.join(", ")}</span><br>
+                        <strong>蓝球:</strong> <span class="ball-blue">${data.blue_balls.join(", ")}</span><br>
+                        <strong>销售额:</strong> ${data.sales_amount}<br>
+                        <strong>奖池金额:</strong> ${data.jackpot_amount}
+                    </div>
+                `;
+            }
+        }
+
+        async function querySsqHistory() {
+            const issueNumber = document.getElementById("ssq_issue_number").value;
+            const response = await fetch(`/query_ssq?issue_number=${issueNumber}`);
+            const data = await response.json();
+            const resultsDiv = document.getElementById("ssq_history_results");
+            resultsDiv.innerHTML = "";
+            if (data.error) {
+                resultsDiv.innerHTML = `<div class="error">${data.error}</div>`;
+            } else {
+                resultsDiv.innerHTML = `
+                    <div>
+                        <strong>期号:</strong> ${data.issue_number}<br>
+                        <strong>开奖日期:</strong> ${data.draw_date}<br>
+                        <strong>红球:</strong> <span class="ball-red">${data.red_balls.join(", ")}</span><br>
+                        <strong>蓝球:</strong> <span class="ball-blue">${data.blue_balls.join(", ")}</span><br>
+                        <strong>销售额:</strong> ${data.sales_amount}<br>
+                        <strong>奖池金额:</strong> ${data.jackpot_amount}
+                    </div>
+                `;
+            }
+        }
+
+        async function fetchLatestDltDraws() {
+            const response = await fetch("/latest_dlt_draws");
+            const data = await response.json();
+            const resultsDiv = document.getElementById("latest_dlt_draws");
+            resultsDiv.innerHTML = "";
+            if (data.error) {
+                resultsDiv.innerHTML = `<div class="error">${data.error}</div>`;
+            } else {
+                let tableHtml = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>期号</th>
+                                <th>开奖日期</th>
+                                <th>红球</th>
+                                <th>蓝球</th>
+                                <th>销售额</th>
+                                <th>奖池金额</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                data.forEach(draw => {
+                    tableHtml += `
+                        <tr>
+                            <td>${draw.issue_number}</td>
+                            <td>${draw.draw_date}</td>
+                            <td><span class="ball-red">${draw.red_balls.join(", ")}</span></td>
+                            <td><span class="ball-blue">${draw.blue_balls.join(", ")}</span></td>
+                            <td>${draw.sales_amount}</td>
+                            <td>${draw.jackpot_amount}</td>
+                        </tr>
+                    `;
+                });
+                tableHtml += `
+                        </tbody>
+                    </table>
+                `;
+                resultsDiv.innerHTML = tableHtml;
+            }
+        }
+
+        async function fetchLatestSsqDraws() {
+            const response = await fetch("/latest_ssq_draws");
+            const data = await response.json();
+            const resultsDiv = document.getElementById("latest_ssq_draws");
+            resultsDiv.innerHTML = "";
+            if (data.error) {
+                resultsDiv.innerHTML = `<div class="error">${data.error}</div>`;
+            } else {
+                let tableHtml = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>期号</th>
+                                <th>开奖日期</th>
+                                <th>红球</th>
+                                <th>蓝球</th>
+                                <th>销售额</th>
+                                <th>奖池金额</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                data.forEach(draw => {
+                    tableHtml += `
+                        <tr>
+                            <td>${draw.issue_number}</td>
+                            <td>${draw.draw_date}</td>
+                            <td><span class="ball-red">${draw.red_balls.join(", ")}</span></td>
+                            <td><span class="ball-blue">${draw.blue_balls.join(", ")}</span></td>
+                            <td>${draw.sales_amount}</td>
+                            <td>${draw.jackpot_amount}</td>
+                        </tr>
+                    `;
+                });
+                tableHtml += `
+                        </tbody>
+                    </table>
+                `;
+                resultsDiv.innerHTML = tableHtml;
+            }
+        }
+
+        // Fetch latest draws on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchLatestDltDraws();
+            fetchLatestSsqDraws();
+        });
+    </script>
+</body>
+</html>

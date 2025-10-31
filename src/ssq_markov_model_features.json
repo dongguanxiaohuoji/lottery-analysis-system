@@ -1,0 +1,54 @@
+{
+    "red_balls": {
+        "frozenset({'even', 'small'})": {
+            "frozenset({'even', 'large'})": 0.16609829488465397,
+            "frozenset({'even', 'small'})": 0.2990972918756269,
+            "frozenset({'odd', 'large'})": 0.20762286860581744,
+            "frozenset({'odd', 'small'})": 0.3271815446339017
+        },
+        "frozenset({'even', 'large'})": {
+            "frozenset({'odd', 'large'})": 0.3857315598548972,
+            "frozenset({'odd', 'small'})": 0.1700927045546151,
+            "frozenset({'even', 'small'})": 0.1396614268440145,
+            "frozenset({'even', 'large'})": 0.3045143087464732
+        },
+        "frozenset({'odd', 'large'})": {
+            "frozenset({'even', 'large'})": 0.3631608443863254,
+            "frozenset({'odd', 'large'})": 0.30356809265832246,
+            "frozenset({'even', 'small'})": 0.14963571828881,
+            "frozenset({'odd', 'small'})": 0.18363534466654213
+        },
+        "frozenset({'odd', 'small'})": {
+            "frozenset({'even', 'small'})": 0.40737721622172407,
+            "frozenset({'odd', 'small'})": 0.29529243937232524,
+            "frozenset({'even', 'large'})": 0.13857754228652944,
+            "frozenset({'odd', 'large'})": 0.15875280211942122
+        }
+    },
+    "blue_balls": {
+        "frozenset({'odd', 'large'})": {
+            "frozenset({'even', 'small'})": 0.25791324736225085,
+            "frozenset({'odd', 'small'})": 0.2473622508792497,
+            "frozenset({'odd', 'large'})": 0.24267291910902697,
+            "frozenset({'even', 'large'})": 0.25205158264947247
+        },
+        "frozenset({'even', 'small'})": {
+            "frozenset({'odd', 'small'})": 0.23915737298636927,
+            "frozenset({'even', 'large'})": 0.2552664188351921,
+            "frozenset({'even', 'small'})": 0.25650557620817843,
+            "frozenset({'odd', 'large'})": 0.24907063197026022
+        },
+        "frozenset({'odd', 'small'})": {
+            "frozenset({'odd', 'large'})": 0.24647887323943662,
+            "frozenset({'even', 'large'})": 0.26291079812206575,
+            "frozenset({'odd', 'small'})": 0.27230046948356806,
+            "frozenset({'even', 'small'})": 0.21830985915492956
+        },
+        "frozenset({'even', 'large'})": {
+            "frozenset({'odd', 'large'})": 0.27485380116959063,
+            "frozenset({'even', 'large'})": 0.24561403508771928,
+            "frozenset({'even', 'small'})": 0.22690058479532163,
+            "frozenset({'odd', 'small'})": 0.25263157894736843
+        }
+    }
+}
